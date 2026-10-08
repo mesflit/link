@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 URL Kısaltıcı</title>
+    <title>Base64 URL Shortener</title>
+    <!-- Google Fonts & Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #38bdf8;
-            --accent-hover: #0ea5e9;
-            --border-color: #334155;
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-surface: #FEF7FF;
+            --md-sys-color-on-surface: #1D1B20;
+            --md-sys-color-surface-variant: #E7E0EC;
+            --md-sys-color-outline: #79747E;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
             margin: 0;
             padding: 0;
             display: flex;
@@ -26,36 +30,43 @@
             min-height: 100vh;
         }
 
-        .container {
-            background-color: var(--card-bg);
+        .card {
+            background-color: #FFFFFF;
             padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             box-sizing: border-box;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(121, 116, 126, 0.2);
+            text-align: center;
         }
 
-        h2 {
+        .card h2 {
             margin-top: 0;
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
-            text-align: center;
-            color: var(--accent-color);
+            font-weight: 500;
+            color: var(--md-sys-color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .input-group {
-            margin-bottom: 1.25rem;
+        .input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+            text-align: left;
         }
 
         input[type="url"] {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-            background-color: #0f172a;
-            color: var(--text-color);
+            border: 1px solid var(--md-sys-color-outline);
+            background-color: transparent;
+            color: var(--md-sys-color-on-surface);
             font-size: 1rem;
             box-sizing: border-box;
             outline: none;
@@ -63,39 +74,52 @@
         }
 
         input[type="url"]:focus {
-            border-color: var(--accent-color);
+            border-color: var(--md-sys-color-primary);
+            border-width: 2px;
         }
 
         button {
             width: 100%;
-            padding: 0.75rem;
-            background-color: var(--accent-color);
-            color: #0f172a;
+            padding: 0.85rem;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 100px;
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         button:hover {
-            background-color: var(--accent-hover);
+            background-color: #584196;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .result {
             margin-top: 1.5rem;
             padding: 1rem;
-            background-color: #0f172a;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
+            background-color: var(--md-sys-color-primary-container);
+            border-radius: 0.75rem;
             word-break: break-all;
             display: none;
-            text-align: center;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .result p {
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+            color: #21005D;
         }
 
         .result a {
-            color: var(--accent-color);
+            color: var(--md-sys-color-primary);
             text-decoration: none;
             font-weight: 500;
         }
@@ -103,41 +127,52 @@
         .result a:hover {
             text-decoration: underline;
         }
+
+        #redirectView p {
+            font-size: 1.1rem;
+            color: var(--md-sys-color-outline);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="app">
-        <h2>Base64 URL Kısaltıcı</h2>
-        
-        <!-- Yönlendirme Ekranı -->
-        <div id="redirectView" style="display: none; text-align: center;">
-            <p>Hedef adrese yönlendiriliyorsunuz...</p>
-            <p><a id="targetLink" href="#" style="color: var(--accent-color);">Gitmek için tıkla</a></p>
+    <div class="card">
+        <!-- Redirect View -->
+        <div id="redirectView" style="display: none;">
+            <span class="material-icons" style="font-size: 48px; color: var(--md-sys-color-primary);">sync</span>
+            <h2>Redirecting</h2>
+            <p>Taking you to your destination...</p>
+            <p><a id="targetLink" href="#">Click here if not redirected</a></p>
         </div>
 
-        <!-- Kısaltma Paneli -->
+        <!-- Generator View -->
         <div id="generatorView">
-            <div class="input-group">
-                <input type="url" id="urlInput" placeholder="https://ornek.com/uzun-link" required>
+            <h2>
+                <span class="material-icons">link</span>
+                Base64 Shortener
+            </h2>
+            <div class="input-container">
+                <input type="url" id="urlInput" placeholder="https://example.com/long-url" required>
             </div>
-            <button onclick="shortenUrl()">Base64'e Çevir & Kısalt</button>
+            <button onclick="shortenUrl()">
+                <span class="material-icons">content_cut</span>
+                Shorten Link
+            </button>
 
             <div class="result" id="resultBox">
-                Kısaltılmış Linkiniz:<br>
+                <p>Your Shortened URL:</p>
                 <a id="shortenedLink" href="#" target="_blank"></a>
             </div>
         </div>
     </div>
 
     <script>
-        // Sayfa açıldığında URL'de Base64 kodu var mı diye kontrol et
+        // Check for Base64 hash on page load
         window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash.substring(1); // '#' işaretini kaldır
+            const hash = window.location.hash.substring(1);
 
             if (hash) {
                 try {
-                    // Base64'ten orijinal URL'ye geri çöz
                     const originalUrl = decodeURIComponent(atob(hash));
                     
                     document.getElementById('redirectView').style.display = 'block';
@@ -145,12 +180,11 @@
                     document.getElementById('targetLink').href = originalUrl;
                     document.getElementById('targetLink').innerText = originalUrl;
 
-                    // Yarım saniye bekleyip yönlendir
                     setTimeout(() => {
                         window.location.replace(originalUrl);
                     }, 500);
                 } catch (e) {
-                    alert('Geçersiz veya bozuk Base64 bağlantısı!');
+                    alert('Invalid or corrupted link!');
                     window.location.hash = '';
                 }
             }
@@ -159,18 +193,14 @@
         function shortenUrl() {
             const url = document.getElementById('urlInput').value.trim();
             if (!url) {
-                alert('Lütfen geçerli bir URL girin.');
+                alert('Please enter a valid URL.');
                 return;
             }
 
-            // Türkçe karakter ve özel semboller sorun olmasın diye encode edip Base64 yapıyoruz
             const base64Code = btoa(encodeURIComponent(url));
-
-            // GitHub Pages linkinin sonuna #Base64Kodu ekle
             const baseUrl = window.location.origin + window.location.pathname;
             const shortUrl = `${baseUrl}#${base64Code}`;
 
-            // Ekranda göster
             const resultBox = document.getElementById('resultBox');
             const shortenedLink = document.getElementById('shortenedLink');
             
