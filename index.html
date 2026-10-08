@@ -152,7 +152,7 @@
                 Base64 Shortener
             </h2>
             <div class="input-container">
-                <input type="url" id="urlInput" placeholder="https://example.com/long-url" required>
+                <input type="text" id="urlInput" placeholder="https://example.com/long-url" required>
             </div>
             <button onclick="shortenUrl()">
                 <span class="material-icons">content_cut</span>
@@ -191,10 +191,15 @@
         });
 
         function shortenUrl() {
-            const url = document.getElementById('urlInput').value.trim();
+            let url = document.getElementById('urlInput').value.trim();
             if (!url) {
                 alert('Please enter a valid URL.');
                 return;
+            }
+
+            // Eğer kullanıcı başına http:// veya https:// yazmadıysa otomatik ekle
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
             }
 
             const base64Code = btoa(encodeURIComponent(url));
