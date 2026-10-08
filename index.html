@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 URL Kısaltıcı</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="url"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            word-break: break-all;
+            display: none;
+            text-align: center;
+        }
+
+        .result a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .result a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        <h2>Base64 URL Kısaltıcı</h2>
+        
+        <!-- Yönlendirme Ekranı -->
+        <div id="redirectView" style="display: none; text-align: center;">
+            <p>Hedef adrese yönlendiriliyorsunuz...</p>
+            <p><a id="targetLink" href="#" style="color: var(--accent-color);">Gitmek için tıkla</a></p>
+        </div>
+
+        <!-- Kısaltma Paneli -->
+        <div id="generatorView">
+            <div class="input-group">
+                <input type="url" id="urlInput" placeholder="https://ornek.com/uzun-link" required>
+            </div>
+            <button onclick="shortenUrl()">Base64'e Çevir & Kısalt</button>
+
+            <div class="result" id="resultBox">
+                Kısaltılmış Linkiniz:<br>
+                <a id="shortenedLink" href="#" target="_blank"></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa açıldığında URL'de Base64 kodu var mı diye kontrol et
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.substring(1); // '#' işaretini kaldır
+
+            if (hash) {
+                try {
+                    // Base64'ten orijinal URL'ye geri çöz
+                    const originalUrl = decodeURIComponent(atob(hash));
+                    
+                    document.getElementById('redirectView').style.display = 'block';
+                    document.getElementById('generatorView').style.display = 'none';
+                    document.getElementById('targetLink').href = originalUrl;
+                    document.getElementById('targetLink').innerText = originalUrl;
+
+                    // Yarım saniye bekleyip yönlendir
+                    setTimeout(() => {
+                        window.location.replace(originalUrl);
+                    }, 500);
+                } catch (e) {
+                    alert('Geçersiz veya bozuk Base64 bağlantısı!');
+                    window.location.hash = '';
+                }
+            }
+        });
+
+        function shortenUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('Lütfen geçerli bir URL girin.');
+                return;
+            }
+
+            // Türkçe karakter ve özel semboller sorun olmasın diye encode edip Base64 yapıyoruz
+            const base64Code = btoa(encodeURIComponent(url));
+
+            // GitHub Pages linkinin sonuna #Base64Kodu ekle
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shortUrl = `${baseUrl}#${base64Code}`;
+
+            // Ekranda göster
+            const resultBox = document.getElementById('resultBox');
+            const shortenedLink = document.getElementById('shortenedLink');
+            
+            shortenedLink.href = shortUrl;
+            shortenedLink.innerText = shortUrl;
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
